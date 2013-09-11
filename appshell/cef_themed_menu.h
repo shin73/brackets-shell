@@ -37,7 +37,8 @@ public:
 
 protected:
     virtual void DoPaintNonClientArea(HDC hdc);
-    void DoDrawMenuBar(HDC hdc);
+    virtual void DoDrawMenuBar(HDC hdc);
+
     BOOL HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS);
     BOOL HandleDrawItem(LPDRAWITEMSTRUCT lpDIS);
     BOOL HandleNcDestroy();

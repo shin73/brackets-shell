@@ -364,14 +364,39 @@ void cef_main_window_xp::InitDeviceContext(HDC hdc)
     ::ExcludeClipRect(hdc, rectClipClient.left, rectClipClient.top, rectClipClient.right, rectClipClient.bottom);
 }
 
+void cef_main_window_xp::DoDrawMenuBar(HDC hdc)
+{
+}
+
+
 void cef_main_window_xp::DoPaintNonClientArea(HDC hdc)
 {
-    // TODO: buffer this drawing to reduce flicker
+    HDC hdcOrig = hdc;
+    RECT rectWindow;
+    GetWindowRect(&rectWindow);
+
+    int Width = ::RectWidth(rectWindow);
+    int Height = ::RectHeight(rectWindow);
+
+    HDC dcMem = ::CreateCompatibleDC(hdc);
+    HBITMAP bm = ::CreateCompatibleBitmap(hdc, Width, Height);
+    HGDIOBJ bmOld = ::SelectObject(dcMem, bm);
+
+    hdc = dcMem;
+
     InitDeviceContext(hdc);
+    InitDeviceContext(hdcOrig);
     DoDrawFrame(hdc);
     DoDrawSystemMenuIcon(hdc);
     DoDrawTitlebarText(hdc);
     DoDrawSystemIcons(hdc);
+    DoDrawMenuBar(hdc);
+
+    ::BitBlt(hdcOrig, 0, 0, Width, Height, dcMem, 0, 0, SRCCOPY);
+
+    ::SelectObject(dcMem, bmOld);
+    ::DeleteObject(bm);
+    ::DeleteDC(dcMem);
 }
 
 void cef_main_window_xp::UpdateNonClientArea()

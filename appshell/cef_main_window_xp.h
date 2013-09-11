@@ -83,6 +83,7 @@ protected:
     virtual void DoDrawSystemMenuIcon(HDC hdc);
     virtual void DoDrawTitlebarText(HDC hdc);
     virtual void DoDrawSystemIcons(HDC hdc);
+    virtual void DoDrawMenuBar(HDC hdc);
 
     virtual void ComputeWindowIconRect(RECT& rect);
     virtual void ComputeWindowCaptionRect(RECT& rect);

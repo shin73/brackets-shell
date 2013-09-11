@@ -130,12 +130,13 @@ void cef_themed_menu::DoPaintNonClientArea(HDC hdc)
     EnforceMenuBackground();
     EnforceOwnerDrawnMenus();
     cef_main_window_xp::DoPaintNonClientArea(hdc);
-    DoDrawMenuBar(hdc);
 }
 
 
 void cef_themed_menu::DoDrawMenuBar(HDC hdc)
 {
+    cef_main_window_xp::DoDrawMenuBar(hdc);
+
     RECT rectBar;
     ComputeMenuBarRect(rectBar);
 
