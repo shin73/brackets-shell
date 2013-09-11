@@ -31,14 +31,17 @@ namespace Gdiplus
 #define CEF_COLOR_BACKGROUND RGB(60, 63, 65)
 #define CEF_COLOR_NORMALTEXT RGB(215, 216, 217)
 
-
-
+// This is so named because it is backwards
+//  compatible with custom frame drawing back to
+//  Windows XP.  There are better ways to do it
+//  on Windows Vista, 7 and 8.
 class cef_main_window_xp : public cef_main_window
 {
-    class NonClientData
+    // Non-client button state data
+    class NonClientButtonStateData
     {
     public:
-	    NonClientData() 
+	    NonClientButtonStateData() 
 	    {
 		    Reset() ;
 	    }
@@ -71,7 +74,6 @@ protected:
     BOOL HandleNcLeftButtonDown(UINT uHitTest);
 
     int HandleNcHitTest(LPPOINT ptHit);
-
     void HandleNcMouseLeave();
 
     void UpdateNonClientArea();
@@ -94,18 +96,19 @@ protected:
     void InitDrawingResources();
     void LoadSysButtonImages();
 
-    Gdiplus::Image* mSysCloseButton;
-    Gdiplus::Image* mSysRestoreButton;
-    Gdiplus::Image* mSysMinimizeButton;
-    Gdiplus::Image* mSysMaximizeButton;
-    Gdiplus::Image* mHoverSysCloseButton;
-    Gdiplus::Image* mHoverSysRestoreButton;
-    Gdiplus::Image* mHoverSysMinimizeButton;
-    Gdiplus::Image* mHoverSysMaximizeButton;
+    Gdiplus::Image*              mSysCloseButton;
+    Gdiplus::Image*              mSysRestoreButton;
+    Gdiplus::Image*              mSysMinimizeButton;
+    Gdiplus::Image*              mSysMaximizeButton;
+    Gdiplus::Image*              mHoverSysCloseButton;
+    Gdiplus::Image*              mHoverSysRestoreButton;
+    Gdiplus::Image*              mHoverSysMinimizeButton;
+    Gdiplus::Image*              mHoverSysMaximizeButton;
 
-    HFONT            mCaptionFont;
-    HBRUSH           mBackgroundBrush;
-    HICON            mWindowIcon;
-    NonClientData    mNonClientData;
-    NONCLIENTMETRICS mNcMetrics;
+    HFONT                        mCaptionFont;
+    HBRUSH                       mBackgroundBrush;
+    HICON                        mWindowIcon;
+    NONCLIENTMETRICS             mNcMetrics;
+
+    NonClientButtonStateData     mNonClientData;
 };

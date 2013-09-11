@@ -27,6 +27,11 @@
 #define CEF_COLOR_MENU_SELECTED_TEXT RGB(30, 30, 30)
 #define CEF_COLOR_MENU_DISABLED_TEXT RGB(130, 130, 130)
 
+// This is split out into its own class 
+//  so that it can easily be templatized and attached
+//  to any cef_window class based object which we 
+//  may do at some later point to optimize drawing
+//  even more for Vista/7 Glass and 8 themeless
 class cef_themed_menu : public cef_main_window_xp
 {
 public:

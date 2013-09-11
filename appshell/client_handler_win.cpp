@@ -205,6 +205,7 @@ void LoadWindowsIcons(HWND wnd)
 
 void ClientHandler::PopupCreated(CefRefPtr<CefBrowser> browser)
 {
+    // TODO: Subclass with darkness
     HWND hWnd = browser->GetHost()->GetWindowHandle();
     AttachWindProcToPopup(hWnd);
     LoadWindowsIcons(hWnd);
