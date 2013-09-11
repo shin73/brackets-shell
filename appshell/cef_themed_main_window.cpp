@@ -19,7 +19,8 @@
 #include "cef_themed_main_window.h"
 
 
-cef_themed_main_window::cef_themed_main_window()
+cef_themed_main_window::cef_themed_main_window() :
+    mShowMenuAccelorators(false)
 {
 
 }
@@ -27,6 +28,14 @@ cef_themed_main_window::~cef_themed_main_window()
 {
 
 }
+
+BOOL cef_themed_main_window::HandleCreate()
+{
+    BOOL result = cef_main_window_xp::HandleCreate();
+
+    return result;
+}
+
 
 void cef_themed_main_window::DoDrawMenuBar(HDC hdc, LPPOINT lpHitTest/*=NULL*/)
 {
@@ -65,14 +74,16 @@ void cef_themed_main_window::DoDrawMenuBar(HDC hdc, LPPOINT lpHitTest/*=NULL*/)
         RECT rectTemp;
         SetRectEmpty(&rectTemp);
 
-        // calc the size of this menu item so we can move the start over for the next guy
+        // Calc the size of this menu item 
         ::DrawText(hdc, szMenuString, wcslen(szMenuString), &rectTemp, DT_LEFT|DT_SINGLELINE|DT_CALCRECT);
 
+        // Determine the menu item state 
         MENUITEMINFO mmi = {0};
         mmi.cbSize = sizeof (mmi);
         mmi.fMask = MIIM_STATE;
         ::GetMenuItemInfo (mbi.hMenu, i, TRUE, &mmi);
 
+        // Highlighted menu items are selected
         if (mmi.fState & MFS_HILITE) {
             RECT rectButton;
             ::CopyRect(&rectButton, &rectText);
@@ -83,8 +94,10 @@ void cef_themed_main_window::DoDrawMenuBar(HDC hdc, LPPOINT lpHitTest/*=NULL*/)
             rgbMenuText = RGB(30, 30, 30);
 
         } else if (mmi.fState & MFS_GRAYED) {
+            // Disabled look
             rgbMenuText = RGB(130, 130, 130);
         } else if (lpHitTest) {
+            // Hover state
             RECT rectTest;
             ::CopyRect(&rectTest, &rectText);
             rectTest.left += 6;
@@ -101,17 +114,29 @@ void cef_themed_main_window::DoDrawMenuBar(HDC hdc, LPPOINT lpHitTest/*=NULL*/)
                 rgbMenuText = RGB(10, 10, 10);
             }
         }
+
+        // This 6 is a fudge -- the menu looks like this 
+        //      [   FILE   ] whereas the area between the brackets 
+        //  is what shows us the selection.  There is no metric that 
+        //  i can find that represents this correct.
         rectText.left += 6;
 
         COLORREF oldRGB = ::SetTextColor(hdc, rgbMenuText);
         int oldBkMode   = ::SetBkMode(hdc, TRANSPARENT);
-        ::DrawText(hdc, szMenuString, wcslen(szMenuString), &rectText, DT_LEFT|DT_SINGLELINE|DT_HIDEPREFIX);
+        UINT format = DT_LEFT|DT_SINGLELINE;
+       
+        if (!mShowMenuAccelorators) 
+            format  |= DT_HIDEPREFIX;
+
+        ::DrawText(hdc, szMenuString, wcslen(szMenuString), &rectText, format);
         ::SetTextColor(hdc, oldRGB);
         ::SetBkMode(hdc, oldBkMode);
-                
+
+        // This 8 is a fudge... We start the next one over 2px
         rectText.left += (rectTemp.right + 8);
     }
 
+    //
     ::SelectObject(hdc, oldFont);            
     ::DeleteObject(hbrHighlight);
     ::DeleteObject(hbrHover);
@@ -140,22 +165,34 @@ void cef_themed_main_window::UpdateMenuBar(LPPOINT lpHitTest/*=NULL*/)
 
     RECT rectMenuBar;
     ComputeMenuBarRect(rectMenuBar);
-    HRGN hrgnUpdate = ::CreateRectRgnIndirect(&rectMenuBar);
+    HRGN rgnUpdate = ::CreateRectRgnIndirect(&rectMenuBar);
 
-    if (::SelectClipRgn(hdc, hrgnUpdate) != NULLREGION) {
+    if (::SelectClipRgn(hdc, rgnUpdate) != NULLREGION) {
         DoDrawFrame(hdc);           
         DoDrawMenuBar(hdc, lpHitTest);
-    }
-
-    ::DeleteObject(hrgnUpdate);
-
+    } 
+    ::DeleteObject(rgnUpdate);
     ReleaseDC(hdc);
 }
 
+void cef_themed_main_window::EnforceOwnerDrawnMenus()
+{
+    HMENU hm = GetMenu();
+    int items = ::GetMenuItemCount(hm);
+    for (int i = 0; i < items; i++) {
+        MENUITEMINFO mmi = {0};
+        mmi.cbSize = sizeof (mmi);
+        mmi.fMask = MIIM_FTYPE;
 
+        ::GetMenuItemInfo(hm, i, TRUE, &mmi);
+        mmi.fType |= MFT_OWNERDRAW;
+        ::SetMenuItemInfo(hm, i, TRUE, &mmi);
+    }
+}
 
 void cef_themed_main_window::DoPaintNonClientArea(HDC hdc)
 {
+    EnforceOwnerDrawnMenus();
     cef_main_window_xp::DoPaintNonClientArea(hdc);
     DoDrawMenuBar(hdc);
 }
@@ -217,6 +254,24 @@ BOOL cef_themed_main_window::HandleNcLeftButtonUp(UINT uHitTest, LPPOINT point)
     
 }
 
+void cef_themed_main_window::ShowMenuAccelerators(bool show/*=true*/)
+{
+#if 0
+    mShowMenuAccelorators = show;
+    UpdateMenuBar();
+#endif
+}
+
+BOOL cef_themed_main_window::HandleSysCommand(UINT uType)
+{
+    if (uType == SC_KEYMENU) {
+        ShowMenuAccelerators(!mShowMenuAccelorators);
+        return TRUE;
+    } 
+    return FALSE;
+}
+
+
 LRESULT cef_themed_main_window::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message) 
@@ -247,6 +302,14 @@ LRESULT cef_themed_main_window::WindowProc(UINT message, WPARAM wParam, LPARAM l
                 return 0L;
         }
         break;
+    case WM_NCRBUTTONDOWN:
+    case WM_NCRBUTTONUP:
+        {
+            if (wParam == HTMENU) 
+                return 0L;
+        }
+        break;
+
     case WM_NCLBUTTONUP:
         {
             POINT pt;
@@ -254,6 +317,11 @@ LRESULT cef_themed_main_window::WindowProc(UINT message, WPARAM wParam, LPARAM l
             if (HandleNcLeftButtonUp((UINT)wParam, &pt))
                 return 0L;
         }
+        break;
+    case WM_SYSCOMMAND:
+        if (HandleSysCommand((UINT)(wParam & 0xFFF0)))
+            return 0L;
+        break;
     }
 
     LRESULT lr = cef_main_window_xp::WindowProc(message, wParam, lParam);
@@ -266,13 +334,13 @@ LRESULT cef_themed_main_window::WindowProc(UINT message, WPARAM wParam, LPARAM l
         break;
 
     case WM_MOUSEACTIVATE:
-        if (wParam != HTMENU) {
+        if (lParam != HTMENU) {
             UpdateMenuBar();
-        } else {
-            POINT pt;
-            POINTSTOPOINT(pt, lParam);
-            UpdateMenuBar(&pt);
-        }
+        } 
+        break;
+    case WM_SYSCOMMAND:
+        HandleSysCommand((UINT)(wParam & 0xFFF0));
+        break;
     }
 
 

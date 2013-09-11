@@ -181,6 +181,9 @@ public:
     BOOL GetMenuBarInfo(LONG idObject, LONG idItem, LPMENUBARINFO pmbi) 
     { return ::GetMenuBarInfo(mWnd, idObject, idItem, pmbi); }
 
+    BOOL DrawMenuBar() 
+    { return ::DrawMenuBar(mWnd); }
+
 protected:
     HWND mWnd;
     WNDPROC mSuperWndProc;

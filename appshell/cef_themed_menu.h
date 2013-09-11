@@ -20,34 +20,27 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-
 #include "cef_main_window_xp.h"
 
-class cef_themed_main_window : public cef_main_window_xp
+class cef_themed_menu : public cef_main_window_xp
 {
 public:
-    cef_themed_main_window();
-    virtual ~cef_themed_main_window();
+    cef_themed_menu();
+    virtual ~cef_themed_menu();
 
     virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+    void EnforceOwnerDrawnMenus(bool enforce = true);
+    void EnforceMenuBackground();
 
 protected:
-    BOOL HandleCreate();
-    BOOL HandleSysCommand(UINT uType);
-    int  HandleNcHitTest(LPPOINT ptHit);
-    BOOL HandleNcMouseMove(UINT uHitTest, LPPOINT point);
-    BOOL HandleNcLeftButtonUp(UINT uHitTest, LPPOINT point);
-    BOOL HandleNcLeftButtonDown(UINT uHitTest, LPPOINT point);
-    void HandleNcMouseLeave();
-
     virtual void DoPaintNonClientArea(HDC hdc);
+    void DoDrawMenuBar(HDC hdc);
+    BOOL HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS);
+    BOOL HandleDrawItem(LPDRAWITEMSTRUCT lpDIS);
+    BOOL HandleNcCreate();
+    BOOL HandleNcDestroy();
 
-    void DoDrawMenuBar(HDC hdc, LPPOINT lpHitTest = NULL);
     void ComputeMenuBarRect(RECT& rect);
-    void UpdateMenuBar(LPPOINT lpHitTest = NULL);
 
-    void ShowMenuAccelerators(bool show = true);
-    void EnforceOwnerDrawnMenus();
-
-    bool mShowMenuAccelorators;
+    HBRUSH mBackgroundBrush;
 };
