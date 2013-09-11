@@ -22,6 +22,11 @@
  */
 #include "cef_main_window_xp.h"
 
+#define CEF_COLOR_MENU_HILITE_BACKGROUND RGB(247, 247, 247)
+#define CEF_COLOR_MENU_HOVER_BACKGROUND RGB(45, 46, 48)
+#define CEF_COLOR_MENU_SELECTED_TEXT RGB(30, 30, 30)
+#define CEF_COLOR_MENU_DISABLED_TEXT RGB(130, 130, 130)
+
 class cef_themed_menu : public cef_main_window_xp
 {
 public:
@@ -29,18 +34,23 @@ public:
     virtual ~cef_themed_menu();
 
     virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-    void EnforceOwnerDrawnMenus(bool enforce = true);
-    void EnforceMenuBackground();
 
 protected:
     virtual void DoPaintNonClientArea(HDC hdc);
     void DoDrawMenuBar(HDC hdc);
     BOOL HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS);
     BOOL HandleDrawItem(LPDRAWITEMSTRUCT lpDIS);
-    BOOL HandleNcCreate();
     BOOL HandleNcDestroy();
-
+    BOOL HandleNcCreate();
+    
     void ComputeMenuBarRect(RECT& rect);
 
-    HBRUSH mBackgroundBrush;
+    void InitDrawingResources();
+    void InitMenuFont();
+    void EnforceOwnerDrawnMenus();
+    void EnforceMenuBackground();
+
+    HFONT mMenuFont;
+    HBRUSH mHighlightBrush;
+    HBRUSH mHoverBrush;
 };

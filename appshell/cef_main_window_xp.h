@@ -27,6 +27,10 @@ namespace Gdiplus
     class Image;
 };
 
+// Color Constants
+#define CEF_COLOR_BACKGROUND RGB(60, 63, 65)
+#define CEF_COLOR_NORMALTEXT RGB(215, 216, 217)
+
 
 
 class cef_main_window_xp : public cef_main_window
@@ -59,7 +63,6 @@ public:
 
 protected:
     BOOL HandleNcCreate();
-    BOOL HandleCreate();
     BOOL HandleNcDestroy();
     BOOL HandleNcPaint(HRGN hUpdateRegion);
     BOOL HandleSysCommand(UINT uType);
@@ -87,6 +90,7 @@ protected:
     virtual void ComputeMaximizeButtonRect(RECT& rect);
     virtual void ComputeCloseButtonRect(RECT& rect);
 
+    void InitDrawingResources();
     void LoadSysButtonImages();
 
     Gdiplus::Image* mSysCloseButton;
@@ -98,6 +102,8 @@ protected:
     Gdiplus::Image* mHoverSysMinimizeButton;
     Gdiplus::Image* mHoverSysMaximizeButton;
 
+    HFONT            mCaptionFont;
+    HBRUSH           mBackgroundBrush;
     HICON            mWindowIcon;
     NonClientData    mNonClientData;
     NONCLIENTMETRICS mNcMetrics;

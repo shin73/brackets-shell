@@ -18,33 +18,63 @@
 #include <stdlib.h>
 #include "cef_themed_menu.h"
 
+static const int kMenuItemSpacingCX = 4;
+static const int kMenuItemSpacingCY = 4;
+static const int kMenuFrameThreshholdCX = 12;
+
 cef_themed_menu::cef_themed_menu() :
-    mBackgroundBrush(NULL)
+    mMenuFont(0),
+    mHighlightBrush(0),
+    mHoverBrush(0)
 {
 
 }
+
 cef_themed_menu::~cef_themed_menu()
 {
 
 }
 
-BOOL cef_themed_menu::HandleNcCreate()
+BOOL cef_themed_menu::HandleNcDestroy()
 {
-    BOOL result = cef_main_window_xp::HandleNcCreate();
+    BOOL result = cef_main_window_xp::HandleNcDestroy();
 
+    ::DeleteObject(mMenuFont);
+    ::DeleteObject(mHighlightBrush);
+    ::DeleteObject(mHoverBrush);
 
     return result;
 }
 
-BOOL cef_themed_menu::HandleNcDestroy()
+void cef_themed_menu::InitDrawingResources()
 {
-    ::DeleteObject(mBackgroundBrush);
-    mBackgroundBrush = NULL;
-    
-    return cef_main_window_xp::HandleNcDestroy();
+    if (mBackgroundBrush == NULL) {                            
+        mBackgroundBrush = ::CreateSolidBrush(CEF_COLOR_BACKGROUND);
+    }
+    if (mHighlightBrush == NULL) {                            
+        mHighlightBrush = ::CreateSolidBrush(CEF_COLOR_MENU_HILITE_BACKGROUND);
+    }
+    if (mHoverBrush == NULL) {                            
+        mHoverBrush = ::CreateSolidBrush(CEF_COLOR_MENU_HOVER_BACKGROUND);
+    }
 }
 
-void cef_themed_menu::EnforceOwnerDrawnMenus(bool enforce/*=true*/)
+void cef_themed_menu::InitMenuFont()
+{
+    if (mMenuFont == NULL) {
+        mMenuFont = ::CreateFontIndirect(&mNcMetrics.lfMenuFont);
+    }
+}
+
+
+BOOL cef_themed_menu::HandleNcCreate()
+{
+    BOOL result = cef_main_window_xp::HandleNcCreate();
+    InitDrawingResources();
+    return result;
+}
+
+void cef_themed_menu::EnforceOwnerDrawnMenus()
 {
     HMENU hm = GetMenu();
     int items = ::GetMenuItemCount(hm);
@@ -54,22 +84,15 @@ void cef_themed_menu::EnforceOwnerDrawnMenus(bool enforce/*=true*/)
         mmi.fMask = MIIM_FTYPE;
 
         ::GetMenuItemInfo(hm, i, TRUE, &mmi);
-        if (enforce)
+        if ((mmi.fType & MFT_OWNERDRAW) == 0) {
             mmi.fType |= MFT_OWNERDRAW;
-        else 
-            mmi.fType &= ~MFT_OWNERDRAW;
-        ::SetMenuItemInfo(hm, i, TRUE, &mmi);
+            ::SetMenuItemInfo(hm, i, TRUE, &mmi);
+        }
     }
 }
 
-
 void cef_themed_menu::EnforceMenuBackground()
 {
-    if (mBackgroundBrush == NULL) {
-        mBackgroundBrush = ::CreateSolidBrush(RGB(60, 63, 65));
-    }
-
-
     MENUBARINFO mbi = {0};
     mbi.cbSize = sizeof(mbi);
     
@@ -105,7 +128,7 @@ void cef_themed_menu::ComputeMenuBarRect(RECT& rect)
 void cef_themed_menu::DoPaintNonClientArea(HDC hdc)
 {
     EnforceMenuBackground();
-    EnforceOwnerDrawnMenus(true);
+    EnforceOwnerDrawnMenus();
     cef_main_window_xp::DoPaintNonClientArea(hdc);
     DoDrawMenuBar(hdc);
 }
@@ -123,17 +146,14 @@ void cef_themed_menu::DoDrawMenuBar(HDC hdc)
         currentTop = rectBar.top + 1,
         currentLeft = rectBar.left;
 
-    wchar_t szMenuString[256] = L"";
-
-
     for (i = 0; i < items; i++) {
-        // Determine the menu item state 
+        // Determine the menu item state and ID
         MENUITEMINFO mmi = {0};
         mmi.cbSize = sizeof (mmi);
         mmi.fMask = MIIM_STATE|MIIM_ID;
         ::GetMenuItemInfo (menu, i, TRUE, &mmi);
-
         
+        // Drawitem only works on ID
         MEASUREITEMSTRUCT mis = {0};
         mis.CtlType = ODT_MENU;
         mis.itemID = mmi.wID;
@@ -142,26 +162,28 @@ void cef_themed_menu::DoDrawMenuBar(HDC hdc)
 
         RECT itemRect;
 
+        // Compute the rect to draw the item in
         itemRect.top = currentTop + 1;
-        itemRect.left = currentLeft + 5;
-        itemRect.right = itemRect.left + mis.itemWidth + 4;
+        itemRect.left = currentLeft + 1 + ::kMenuItemSpacingCX;
+        itemRect.right = itemRect.left + mis.itemWidth + ::kMenuItemSpacingCX;
         itemRect.bottom = itemRect.top + mis.itemHeight;
 
         // check to see if if we need to wrap to a new line
         if (rectBar.left < currentLeft) {
-            if (itemRect.right >= (rectBar.right - 12)) {
+            if (itemRect.right >= (rectBar.right - ::kMenuFrameThreshholdCX)) {
                 currentLeft = rectBar.left;
                 currentTop = itemRect.bottom - 1;
 
                 itemRect.top = currentTop + 1;
-                itemRect.left = currentLeft + 5;
-                itemRect.right = itemRect.left + mis.itemWidth + 4;
+                itemRect.left = currentLeft + 1 + ::kMenuItemSpacingCX;
+                itemRect.right = itemRect.left + mis.itemWidth + ::kMenuItemSpacingCX;
                 itemRect.bottom = itemRect.top + mis.itemHeight;
             }
         }
 
-        currentLeft = itemRect.right + 5;
+        currentLeft = itemRect.right + 1 + ::kMenuItemSpacingCX;
 
+        // Draw the menu item
         DRAWITEMSTRUCT dis = {0};
         dis.CtlType = ODT_MENU;
         dis.itemID = mmi.wID;
@@ -184,7 +206,6 @@ void cef_themed_menu::DoDrawMenuBar(HDC hdc)
 
 }
 
-
 BOOL cef_themed_menu::HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 {
     static wchar_t szMenuString[256] = L"";
@@ -192,10 +213,11 @@ BOOL cef_themed_menu::HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS)
     if (lpMIS->CtlType == ODT_MENU) {
         HDC dc      = GetWindowDC();
         HMENU menu  = GetMenu();
-
-        int items       = ::GetMenuItemCount(menu);
-        HFONT fontMenu  = ::CreateFontIndirect(&mNcMetrics.lfMenuFont);
-        HGDIOBJ fontOld = ::SelectObject(dc, fontMenu);            
+        int items   = ::GetMenuItemCount(menu);
+        
+        InitMenuFont();
+        
+        HGDIOBJ fontOld = ::SelectObject(dc, mMenuFont);            
 
         ::GetMenuString(menu, lpMIS->itemID, szMenuString, _countof(szMenuString), MF_BYCOMMAND);
 
@@ -203,14 +225,12 @@ BOOL cef_themed_menu::HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS)
         SetRectEmpty(&rectTemp);
 
         // Calc the size of this menu item 
-        ::DrawText(dc, szMenuString, wcslen(szMenuString), &rectTemp, DT_LEFT|DT_SINGLELINE|DT_CALCRECT);
+        ::DrawText(dc, szMenuString, ::wcslen(szMenuString), &rectTemp, DT_SINGLELINE|DT_CALCRECT);
 
-        lpMIS->itemHeight = ::RectHeight(rectTemp) + 4;
-        lpMIS->itemWidth = ::RectWidth(rectTemp) + 80;
+        lpMIS->itemHeight = ::RectHeight(rectTemp) + ::kMenuItemSpacingCY;
+        lpMIS->itemWidth = ::RectWidth(rectTemp) + ::kMenuItemSpacingCX;
 
         ::SelectObject(dc, fontOld);            
-        ::DeleteObject(fontMenu);
-
         ReleaseDC(dc);
         return TRUE;
     }
@@ -224,26 +244,26 @@ BOOL cef_themed_menu::HandleDrawItem(LPDRAWITEMSTRUCT lpDIS)
     static wchar_t szMenuString[256] = L"";
 
     if (lpDIS->CtlType == ODT_MENU) {
-        int items       =       ::GetMenuItemCount((HMENU)lpDIS->hwndItem);
-        HFONT fontMenu  =       ::CreateFontIndirect(&mNcMetrics.lfMenuFont);
-        HGDIOBJ fontOld =       ::SelectObject(lpDIS->hDC, fontMenu);            
-        HBRUSH hbrHighlight =   ::CreateSolidBrush(RGB(247, 247, 247));
-        HBRUSH hbrHover =       ::CreateSolidBrush(RGB(45, 46, 48));
-        COLORREF rgbMenuText =  RGB(215, 216, 217);
+        int items = ::GetMenuItemCount((HMENU)lpDIS->hwndItem);
+
+        InitMenuFont();
+
+        HGDIOBJ fontOld = ::SelectObject(lpDIS->hDC, mMenuFont);            
+        COLORREF rgbMenuText =  CEF_COLOR_NORMALTEXT;
 
         ::GetMenuString((HMENU)lpDIS->hwndItem, lpDIS->itemID, szMenuString, _countof(szMenuString), MF_BYCOMMAND);
         
         if (lpDIS->itemState & ODS_SELECTED) {
-            ::FillRect(lpDIS->hDC, &lpDIS->rcItem, hbrHighlight);
-            rgbMenuText = RGB(30, 30, 30);
+            ::FillRect(lpDIS->hDC, &lpDIS->rcItem, mHighlightBrush);
+            rgbMenuText = CEF_COLOR_MENU_SELECTED_TEXT;
         } else if (lpDIS->itemState & ODS_HOTLIGHT) {
-            ::FillRect(lpDIS->hDC, &lpDIS->rcItem, hbrHover);
+            ::FillRect(lpDIS->hDC, &lpDIS->rcItem, mHoverBrush);
         } else {
             ::FillRect(lpDIS->hDC, &lpDIS->rcItem, mBackgroundBrush);
         }
         
         if (lpDIS->itemState & ODS_GRAYED) {
-            rgbMenuText = RGB(130, 130, 130);
+            rgbMenuText = CEF_COLOR_MENU_DISABLED_TEXT;
         }
 
         COLORREF oldRGB = ::SetTextColor(lpDIS->hDC, rgbMenuText);
@@ -262,10 +282,6 @@ BOOL cef_themed_menu::HandleDrawItem(LPDRAWITEMSTRUCT lpDIS)
         ::SetBkMode(lpDIS->hDC, oldBkMode);
         ::SetTextColor(lpDIS->hDC, oldRGB);
 
-        ::DeleteObject(fontMenu);
-        ::DeleteObject(hbrHighlight);
-        ::DeleteObject(hbrHover);
-
         return TRUE;
     }
 
@@ -278,6 +294,15 @@ LRESULT cef_themed_menu::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message) 
     {
+    case WM_NCCREATE:
+        if (HandleNcCreate())
+            return 0L;
+        break;
+    case WM_NCDESTROY:
+        if (HandleNcDestroy())
+            return 0L;
+        break;
+
     case WM_MEASUREITEM:
         if (HandleMeasureItem((LPMEASUREITEMSTRUCT)lParam))
             return TRUE;

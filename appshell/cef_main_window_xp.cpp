@@ -72,7 +72,9 @@ cef_main_window_xp::cef_main_window_xp() :
     mHoverSysRestoreButton(0),
     mHoverSysMinimizeButton(0),
     mHoverSysMaximizeButton(0),
-    mWindowIcon(0)
+    mWindowIcon(0),
+    mBackgroundBrush(0),
+    mCaptionFont(0)
 {
     ::ZeroMemory(&mNcMetrics, sizeof(mNcMetrics));
 }
@@ -82,14 +84,25 @@ cef_main_window_xp::~cef_main_window_xp()
 
 }
 
-void cef_main_window_xp::LoadSysButtonImages()
+void cef_main_window_xp::InitDrawingResources()
 {
     mNcMetrics.cbSize = sizeof (mNcMetrics);
     ::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, 0, &mNcMetrics, 0);
 
-
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+    LoadSysButtonImages();
+
+    ::SetWindowTheme(mWnd, L"", L"");
+
+    if (mBackgroundBrush == NULL) {                            
+        mBackgroundBrush = ::CreateSolidBrush(CEF_COLOR_BACKGROUND);
+    }
+}
+
+void cef_main_window_xp::LoadSysButtonImages()
+{
 
     if (mSysCloseButton == NULL) {
         mSysCloseButton = ResourceImage::FromResource(MAKEINTRESOURCE(IDB_CLOSE_BUTTON));
@@ -123,22 +136,13 @@ void cef_main_window_xp::LoadSysButtonImages()
         mHoverSysMaximizeButton = ResourceImage::FromResource(MAKEINTRESOURCE(IDB_MAX_HOVER_BUTTON));
     }
 
-    ::SetWindowTheme(mWnd, L"", L"");
 }
 
 BOOL cef_main_window_xp::HandleNcCreate()
 {
-    LoadSysButtonImages();
+    InitDrawingResources();
     return FALSE;
 }
-
-// TODO This can go if we don't need it
-BOOL cef_main_window_xp::HandleCreate()
-{
-    BOOL result = cef_main_window::HandleCreate();
-    return result;
-}
-
 
 BOOL cef_main_window_xp::HandleNcDestroy()
 {
@@ -157,6 +161,9 @@ BOOL cef_main_window_xp::HandleNcDestroy()
     delete mHoverSysMaximizeButton;
 
     Gdiplus::GdiplusShutdown(gdiplusToken);
+
+    ::DeleteObject(mBackgroundBrush);
+    ::DeleteObject(mCaptionFont);
 
     return result;
 }
@@ -255,11 +262,7 @@ void cef_main_window_xp::DoDrawFrame(HDC hdc)
     rectFrame.bottom = ::RectHeight(rectWindow);
     rectFrame.right = ::RectWidth(rectWindow);
 
-    // TODO: cache this brush and use const color
-                            
-    HBRUSH br = ::CreateSolidBrush(RGB(60, 63, 65));
-    FillRect(hdc, &rectFrame, br);
-    DeleteObject(br);
+    ::FillRect(hdc, &rectFrame, mBackgroundBrush);
 }
 
 void cef_main_window_xp::DoDrawSystemMenuIcon(HDC hdc)
@@ -278,12 +281,14 @@ void cef_main_window_xp::DoDrawSystemMenuIcon(HDC hdc)
 
 void cef_main_window_xp::DoDrawTitlebarText(HDC hdc)
 {
-    // TODO: cache this font
-    HFONT hCaptionFont= ::CreateFontIndirect(&mNcMetrics.lfCaptionFont);
-    HGDIOBJ hPreviousFont = ::SelectObject(hdc, hCaptionFont);        
+    if (mCaptionFont == 0) {
+        mCaptionFont = ::CreateFontIndirect(&mNcMetrics.lfCaptionFont);
+    }
+
+    HGDIOBJ hPreviousFont = ::SelectObject(hdc, mCaptionFont);        
 
     int oldBkMode = ::SetBkMode(hdc, TRANSPARENT);
-    COLORREF oldRGB = ::SetTextColor(hdc, RGB(197,197,197));
+    COLORREF oldRGB = ::SetTextColor(hdc, CEF_COLOR_NORMALTEXT);
 
     RECT textRect;
     ComputeWindowCaptionRect(textRect);
@@ -299,9 +304,6 @@ void cef_main_window_xp::DoDrawTitlebarText(HDC hdc)
     ::SetTextColor(hdc, oldRGB);
     ::SetBkMode(hdc, oldBkMode);
     ::SelectObject(hdc, hPreviousFont);
-
-    // TODO: Once we start caching the font we will need to move this to DestroyWindow()
-    ::DeleteObject(hCaptionFont);
 }
 
 void cef_main_window_xp::DoDrawSystemIcons(HDC hdc)
@@ -392,7 +394,6 @@ BOOL cef_main_window_xp::HandleSysCommand(UINT uType)
 {
     return TRUE;
 }
-
 
 int cef_main_window_xp::HandleNcHitTest(LPPOINT ptHit)
 {
@@ -645,10 +646,6 @@ LRESULT cef_main_window_xp::WindowProc(UINT message, WPARAM wParam, LPARAM lPara
         if (HandleNcCreate())
             return 0L;
         break;  
-    case WM_CREATE:
-        if (HandleCreate())
-            return 0L;
-        break;
     case WM_NCPAINT:
         if (HandleNcPaint((HRGN)wParam)) 
             return 0L;
