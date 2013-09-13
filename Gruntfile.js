@@ -186,7 +186,7 @@ module.exports = function (grunt) {
             }
         },
         "build": {
-            "name"              : "Brackets",
+            "name"              : "Universions",
             "staging"           : staging
         },
         "git": {
