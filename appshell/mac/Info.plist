@@ -4,39 +4,17 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string>appshell.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>io.brackets.appshell</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>0.33.0</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.33.0</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Folder</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>fold</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>CFBundleTypeName</key>
-			<string>Folder</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -52,10 +30,6 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleTypeName</key>
-			<string>HTML source</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>htm</string>
@@ -76,34 +50,34 @@
 				<string>jsp</string>
 				<string>aspx</string>
 			</array>
+			<key>CFBundleTypeName</key>
+			<string>HTML source</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeName</key>
-			<string>JavaScript source</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>js</string>
 				<string>jsx</string>
 			</array>
+			<key>CFBundleTypeName</key>
+			<string>JavaScript source</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeName</key>
-			<string>CSS source</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>css</string>
 				<string>less</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Markdown</string>
+			<string>CSS source</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>md</string>
@@ -112,63 +86,63 @@
 				<string>mdown</string>
 				<string>markdown</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Groovy source</string>
+			<string>Markdown</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>groovy</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Properties</string>
+			<string>Groovy source</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>ini</string>
 				<string>properties</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>SCSS</string>
+			<string>Properties</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>scss</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>EJS</string>
+			<string>SCSS</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>ejs</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>JSON</string>
+			<string>EJS</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>json</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>XML</string>
+			<string>JSON</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>svg</string>
@@ -185,12 +159,12 @@
 				<string>mathml</string>
 				<string>config</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>PHP</string>
+			<string>XML</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>php</string>
@@ -200,24 +174,24 @@
 				<string>phtm</string>
 				<string>phtml</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>C</string>
+			<string>PHP</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>c</string>
 				<string>h</string>
 				<string>i</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>C++</string>
+			<string>C</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>cc</string>
@@ -231,12 +205,12 @@
 				<string>h++</string>
 				<string>ii</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>C#</string>
+			<string>C++</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>cs</string>
@@ -244,66 +218,66 @@
 				<string>asax</string>
 				<string>ashx</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Java</string>
+			<string>C#</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>java</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Scala</string>
+			<string>Java</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>scala</string>
 				<string>sbt</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>CoffeeScript</string>
+			<string>Scala</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>coffee</string>
 				<string>cf</string>
 				<string>cson</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Clojure</string>
+			<string>CoffeeScript</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>clj</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Perl</string>
+			<string>Clojure</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>pl</string>
 				<string>pm</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Ruby</string>
+			<string>Perl</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>rb</string>
@@ -311,91 +285,115 @@
 				<string>gemspec</string>
 				<string>rake</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Python</string>
+			<string>Ruby</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>py</string>
 				<string>pyw</string>
 				<string>wsgi</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>SASS</string>
+			<string>Python</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>sass</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Lua</string>
+			<string>SASS</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>lua</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>SQL</string>
+			<string>Lua</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>sql</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Diff</string>
+			<string>SQL</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>diff</string>
 				<string>patch</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>YAML</string>
+			<string>Diff</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>yaml</string>
 				<string>yml</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Haxe</string>
+			<string>YAML</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>hx</string>
 			</array>
-		</dict>
-		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Bash</string>
+			<string>Haxe</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>sh</string>
 			</array>
+			<key>CFBundleTypeName</key>
+			<string>Bash</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 		</dict>
 	</array>
+	<key>CFBundleExecutable</key>
+	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.brackets.appshell</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>${PRODUCT_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.33.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.33.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

@@ -680,7 +680,36 @@ public:
         } else if (message_name == "DragWindow") {     
             // Parameters: none       
             DragWindow(browser);
-        } 
+        }
+        
+        // [ike 追加]=========================
+        else if (message_name == "uvs_svn_c") {
+            
+            // Parameters:
+            //  0: int32 - callback id
+            
+			
+			if (argList->GetSize() != 2 ||
+                argList->GetType(1) != VTYPE_STRING) {
+                
+				error = ERR_INVALID_PARAMS;
+                
+			}
+            
+            CefRefPtr<CefListValue> svn_stdout = CefListValue::Create();
+            
+            if (error == NO_ERROR) {
+                ExtensionString w_cmd  = argList->GetString(1);
+                
+                error = uvs_svn_c(w_cmd , svn_stdout);
+            }
+            
+            // Set response args for this function
+            responseArgs->SetList(2 , svn_stdout);
+            
+        }
+        // [ike 追加]=========================
+
         else {
             fprintf(stderr, "Native function not implemented yet: %s\n", message_name.c_str());
             return false;

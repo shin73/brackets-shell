@@ -143,3 +143,8 @@ int32 SetMenuItemShortcut(CefRefPtr<CefBrowser> browser, ExtensionString command
 int32 GetMenuPosition(CefRefPtr<CefBrowser> browser, const ExtensionString& commandId, ExtensionString& parentId, int& index);
 
 void DragWindow(CefRefPtr<CefBrowser> browser);
+
+// [ike追加]=========================
+int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout);
+// [ike追加]=========================
+

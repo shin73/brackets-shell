@@ -807,6 +807,17 @@ if (!appshell.app) {
         DragWindow();
     };
  
+    // [ike 追加]=========================
+    /**
+     * svn commit
+     *
+     */
+    native function uvs_svn_c();
+    appshell.app.uvs_svn_c = function (cmd , callback) {
+        var resultString = uvs_svn_c(callback , cmd);
+    };
+    // [ike 追加]=========================
+ 
     // Alias the appshell object to brackets. This is temporary and should be removed.
     brackets = appshell;
 })();

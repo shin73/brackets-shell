@@ -1136,3 +1136,62 @@ void DragWindow(CefRefPtr<CefBrowser> browser)
         [win displayIfNeeded];
     }
 }
+
+int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout){
+    
+    
+    std::string cmd(w_cmd.c_str() , w_cmd.length());
+    
+    std::string ret;
+    
+    FILE *f;
+	
+    
+//    wcstombs((char *)cmd.c_str() , w_cmd.c_str(), cmd.length());
+//    wcstombs((char*)cmd.c_str(), w_cmd.c_str(), cmd.length());
+    
+    cmd += " > /Users/yanshi/dev/uvs.txt ";
+    
+    
+    
+    if ((f = fopen("/Users/yanshi/dev/cmd_his.txt" , "a")))
+    {
+        fputs(cmd.c_str(), f);
+        fputs("\n" , f);
+        fclose(f);
+    }
+    
+    
+    system(cmd.c_str());
+    
+    
+    
+    char line[256];
+    
+    if ((f = fopen("/Users/yanshi/dev/uvs.txt" , "r")) == NULL)
+    {
+        return 0;
+    }
+    
+    while (fgets(line , 256, f) != NULL)
+    {
+        printf("%s", line);
+        
+        ret = ret + line + "\n";
+    }
+    
+    fclose(f);
+    
+    
+    if ((f = fopen("/Users/yanshi/dev/cmd_his.txt" , "a")))
+    {
+        fputs(ret.c_str() , f);
+        fputs("\n" , f);
+        fclose(f);
+    }
+    
+    
+    svn_stdout->SetString(0, ret);
+    
+    return 1;
+}
