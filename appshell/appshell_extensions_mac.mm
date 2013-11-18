@@ -1137,31 +1137,38 @@ void DragWindow(CefRefPtr<CefBrowser> browser)
     }
 }
 
+// [ik追加コード部分]=========================↓
 int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout){
     
     
+    // マルチバイト文字列
     std::string cmd(w_cmd.c_str() , w_cmd.length());
     
+	// 標準出力読み
     std::string ret;
     
+	// ファイルポインタ
     FILE *f;
 	
     
-//    wcstombs((char *)cmd.c_str() , w_cmd.c_str(), cmd.length());
-//    wcstombs((char*)cmd.c_str(), w_cmd.c_str(), cmd.length());
+    // 引数のワイド文字列をマルチバイトに変換
+    //wcstombs((char *)cmd.c_str() , w_cmd.c_str() , cmd.length());
+    
     
     cmd += " > /Users/yanshi/dev/uvs.txt ";
     
     
+	// ※デバック用
     
     if ((f = fopen("/Users/yanshi/dev/cmd_his.txt" , "a")))
     {
         fputs(cmd.c_str(), f);
-        fputs("\n" , f);
+        fputs("¥r¥n" , f);
         fclose(f);
     }
     
     
+	// コマンド実行
     system(cmd.c_str());
     
     
@@ -1175,23 +1182,28 @@ int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout){
     
     while (fgets(line , 256, f) != NULL)
     {
+        /* ここではfgets()により１行単位で読み出し */
         printf("%s", line);
         
-        ret = ret + line + "\n";
+        ret = ret + line + "¥r¥n";
     }
     
     fclose(f);
     
     
+	// ※デバック用
+    
     if ((f = fopen("/Users/yanshi/dev/cmd_his.txt" , "a")))
     {
         fputs(ret.c_str() , f);
-        fputs("\n" , f);
+        fputs("¥r¥n" , f);
         fclose(f);
     }
     
     
     svn_stdout->SetString(0, ret);
     
+    // 正常戻り
     return 1;
 }
+// [ik追加コード部分]=========================↑

@@ -155,8 +155,8 @@ module.exports = function (grunt) {
                     {
                         "dot"       : true,
                         "expand"    : true,
-                        "cwd"       : "<%= git.www.repo %>/src",
-                        "src"       : ["**", "!**/.git*"],
+                        "cwd"       : "<%= git.www.repo %>",
+                        "src"       : [".git", "**", "!**/.git*"],
                         "dest"      : "<%= build.staging %>/www/"
                     }
                 ]
@@ -191,7 +191,7 @@ module.exports = function (grunt) {
         },
         "git": {
             "www": {
-                "repo"      : "../brackets",    // TODO user configurable?
+                "repo"      : "../universions",    // TODO user configurable?
                 "branch"    : grunt.option("www-branch") || ""
             },
             "shell": {
