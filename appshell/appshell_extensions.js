@@ -818,6 +818,14 @@ if (!appshell.app) {
     };
     // [ike 追加]=========================
  
+    /**
+     * Show the otification
+     */
+    native function ShowNotification();
+    appshell.app.showNotification = function (title, body, callback){
+        ShowNotification(callback || _dummyCallback, title, body);
+    };
+ 
     // Alias the appshell object to brackets. This is temporary and should be removed.
     brackets = appshell;
 })();

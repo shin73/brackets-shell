@@ -7,6 +7,7 @@
 #import <objc/runtime.h>
 #include <sstream>
 #include "cefclient.h"
+#include "cefclient_mac.h"
 #include "include/cef_app.h"
 #include "include/cef_version.h"
 #import "include/cef_application_mac.h"
@@ -780,8 +781,22 @@ Class GetShellWindowFrameClass() {
   }
   return YES;
 }
+
 @end
 
+@implementation AppDelegate
+
+//User Notification
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
+}
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{
+    return YES;
+}
+
+@end
 
 int main(int argc, char* argv[]) {
   // Initialize the AutoRelease pool.
@@ -931,3 +946,4 @@ CefString AppGetChromiumVersionString() {
   CefString result = CefString([s UTF8String]);
   return result;
 }
+

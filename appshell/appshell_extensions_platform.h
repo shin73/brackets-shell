@@ -144,7 +144,7 @@ int32 GetMenuPosition(CefRefPtr<CefBrowser> browser, const ExtensionString& comm
 
 void DragWindow(CefRefPtr<CefBrowser> browser);
 
-// [ike追加]=========================
 int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout);
-// [ike追加]=========================
+
+int32 ShowNotification(ExtensionString title , ExtensionString body, CefRefPtr<CefListValue>& svn_stdout);
 
