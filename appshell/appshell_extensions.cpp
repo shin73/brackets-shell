@@ -709,6 +709,30 @@ public:
             
         }
         // [ike 追加]=========================
+        
+        else if(message_name == "ShowNotification"){
+            // Parameters:
+            //  0: int32 - callback id
+            //  1: string - title
+            //  2: string - body
+
+			if (argList->GetSize() != 3 ||
+                argList->GetType(1) != VTYPE_STRING ||
+                argList->GetType(2) != VTYPE_STRING) {
+                
+				error = ERR_INVALID_PARAMS;
+                
+			}
+
+            if (error == NO_ERROR) {
+                ExtensionString title = argList->GetString(1);
+                ExtensionString body = argList->GetString(2);
+                
+                error = ShowNotification(title, body);
+                // No additional response args for this function
+            }
+
+        }
 
         else {
             fprintf(stderr, "Native function not implemented yet: %s\n", message_name.c_str());

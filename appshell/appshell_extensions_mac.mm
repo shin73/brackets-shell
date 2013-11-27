@@ -1208,7 +1208,7 @@ int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout){
 }
 // [ik追加コード部分]=========================↑
 
-int32 ShowNotification(ExtensionString title , ExtensionString body, CefRefPtr<CefListValue>& svn_stdout){
+int32 ShowNotification(ExtensionString title , ExtensionString body){
     NSString *nsTitle = [NSString stringWithUTF8String:title.c_str()];
     NSString *nsBody = [NSString stringWithUTF8String:body.c_str()];
 
