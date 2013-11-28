@@ -3,25 +3,25 @@
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "appshell32-1.png",
+      "filename" : "appshell32.png",
       "scale" : "1x"
     },
     {
       "size" : "16x16",
       "idiom" : "mac",
-      "filename" : "appshell32-3.png",
+      "filename" : "appshell32-1.png",
       "scale" : "2x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "appshell32.png",
+      "filename" : "appshell32-2.png",
       "scale" : "1x"
     },
     {
       "size" : "32x32",
       "idiom" : "mac",
-      "filename" : "appshell32-2.png",
+      "filename" : "appshell32-3.png",
       "scale" : "2x"
     },
     {
