@@ -757,6 +757,17 @@ if (!appshell.app) {
     appshell.app.getApplicationSupportDirectory = function () {
         return GetApplicationSupportDirectory();
     };
+
+
+    /**
+     * Returns the full path of the application installed directory.
+     *
+     * @return {string} Full path of the application installed directory
+     */
+    native function GetApplicationInstalledDirectory();
+    appshell.app.getApplicationInstalledDirectory = function () {
+        return GetApplicationInstalledDirectory();
+    };
   
     /**
      * Returns the full path of the user's documents directory.

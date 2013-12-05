@@ -147,4 +147,3 @@ void DragWindow(CefRefPtr<CefBrowser> browser);
 int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout);
 
 int32 ShowNotification(ExtensionString title , ExtensionString body);
-

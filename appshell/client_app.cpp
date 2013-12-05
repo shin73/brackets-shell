@@ -155,6 +155,8 @@ class AppShellExtensionHandler : public CefV8Handler {
           retval = CefV8Value::CreateString(client_app_->GetCurrentLanguage());
       } else if (name == "GetApplicationSupportDirectory") {
           retval = CefV8Value::CreateString(ClientApp::AppGetSupportDirectory());
+      } else if (name == "GetApplicationInstalledDirectory") {
+          retval = CefV8Value::CreateString(ClientApp::AppGetInstalledDirectory());
       } else if (name == "GetUserDocumentsDirectory") {
           retval = CefV8Value::CreateString(ClientApp::AppGetDocumentsDirectory());
       } else if (name == "GetRemoteDebuggingPort") {

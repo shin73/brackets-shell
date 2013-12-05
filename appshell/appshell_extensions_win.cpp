@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include "config.h"
+#include <mmsystem.h>
 #define CLOSING_PROP L"CLOSING"
 #define UNICODE_MINUS 0x2212
 #define UNICODE_LEFT_ARROW 0x2190
@@ -1770,70 +1771,126 @@ void DragWindow(CefRefPtr<CefBrowser> browser) {
 // [ik追加コード部分]=========================↓
 int32 uvs_svn_c(ExtensionString w_cmd , CefRefPtr<CefListValue>& svn_stdout){
 
+	// パイプ作成
 
-    // マルチバイト文字列
-    std::string cmd("" , w_cmd.length());
+		// 変数
 
-	// 標準出力読み
-    std::string ret;
+			// セキュリティ属性構造体
+			SECURITY_ATTRIBUTES secattr;
+			// 入力ハンドル、出力ハンドル
+			HANDLE rPipe, wPipe;
 
-	// ファイルポインタ
-    FILE *f;
-	
+		// 初期化
 
-    // 引数のワイド文字列をマルチバイトに変換
-    wcstombs((char *)cmd.c_str() , w_cmd.c_str() , cmd.length());
-    
+			// メモリ初期化
+			ZeroMemory(&secattr,sizeof(secattr));
+			// 構造体サイズセット
+			secattr.nLength = sizeof(secattr);
+			// 子プロセスでもハンドル使用許可
+			secattr.bInheritHandle = TRUE;
 
-    cmd += " > uvs.txt 2>>&1 ";
+		// パイプ作成
+		CreatePipe(&rPipe , &wPipe , &secattr , 0);
+
+
+	// プロセス生成
+
+		// 変数
+
+			// プロセス使用時必要情報管理構造体
+			STARTUPINFO sInfo; 
+			// プロセス生成後情報取得用構造体
+			PROCESS_INFORMATION pInfo; 
+
+		// 初期化
+
+			// メモリ初期化
+			ZeroMemory(&sInfo,sizeof(sInfo));
+			// メモリ初期化
+			ZeroMemory(&pInfo,sizeof(pInfo));
+			// 構造体サイズセット
+			sInfo.cb=sizeof(sInfo);
+			// 標準入出力関連設置使用フラグ
+			sInfo.dwFlags=STARTF_USESTDHANDLES;
+			// 標準入力オフ
+			sInfo.hStdInput=NULL; 
+			// 標準出力と出力パイプ紐付け
+			sInfo.hStdOutput=wPipe; 
+			// 標準エラー出力と出力パイプ紐付け
+			sInfo.hStdError=wPipe;
+
+		// プロセス生成
+		// [memo]NORMAL_PRIORITY_CLASS：一般的なプロセス、CREATE_NO_WINDOW：コンソールウィンドウ非表示
+		CreateProcess(0 , (LPWSTR)w_cmd.c_str() , 0 , 0 , TRUE , NORMAL_PRIORITY_CLASS|CREATE_NO_WINDOW , 0 , 0 , &sInfo , &pInfo);
+		// 出力パイプハンドルクローズ
+		CloseHandle(wPipe);
+
+
+	// 標準出力取得
+
+		// 変数
+
+			// 標準出力格納用(※マルチバイト文字列)
+			std::string stdout1; 
+			// 実際に読み取ったバイト数
+			DWORD read_len; 
+			// 読み結果
+			BOOL res;
+			// バッファサイズ
+			#define BUF_SIZE 1024
+
+		// パイプから読み
+
+			do
+			{
+				// バッファ初期化
+				char buf[BUF_SIZE] =  {'\0'};
+
+				// 読み
+				res=::ReadFile(rPipe , buf , BUF_SIZE , &read_len , 0);
+
+				// 標準出力格納用に連結格納
+				stdout1 += buf;
+
+			}while(res);
 
 
 	// ※デバック用
+		//FILE *f;
 
-		if ((f = fopen("cmd_his.txt" , "a")))
-		{
-			fputs(cmd.c_str(), f);
-			fputs("\n" , f);
-			fclose(f);
-		}
+		//if ((f = fopen("cmd_his.txt" , "a")))
+		//{
+		//	fputs(stdout1.c_str() , f);
+		//	fputs("\n" , f);
+		//	fclose(f);
+		//}
 
+	// コールバックにセット
 
-	// コマンド実行
-    system(cmd.c_str());
+		// コールバック返却用ワイド文字列
+		wchar_t w_ret[BUF_SIZE];
 
+		// ロケール確認
+		char * locale = setlocale(LC_ALL, "");
 
+		// マルチバイトからワイド文字列に変換
+		mbstowcs(w_ret, stdout1.c_str() , stdout1.length() + 1 );
 
-    char line[256];
+		// コールバックに引渡
+		svn_stdout->SetString(0, w_ret);
 
-    if ((f = fopen("uvs.txt" , "r")) == NULL)
-    {
-        return 0;
-    }
+		
 
-    while (fgets(line , 256, f) != NULL)
-    {
-        /* ここではfgets()により１行単位で読み出し */
-        printf("%s", line);
-
-        ret = ret + line + "\n";
-    }
-
-    fclose(f);
-
-
-	// ※デバック用
-
-		if ((f = fopen("cmd_his.txt" , "a")))
-		{
-			fputs(ret.c_str() , f);
-			fputs("\n" , f);
-			fclose(f);
-		}
-
-
-    svn_stdout->SetString(0, ret);
-
-    // 正常戻り
+	// 正常戻り (※今のところ常に正常として戻す(暫定))
     return 1;
+
 }
 // [ik追加コード部分]=========================↑
+
+
+int32 ShowNotification(ExtensionString title , ExtensionString body){
+	PlaySound(TEXT("Resources/notify.mp3"), NULL, SND_FILENAME | SND_SYNC | SND_ASYNC);
+	//sMessageBoxA(NULL, title.c_str(),  "Message", MB_OK | MB_ICONINFORMATION);
+	return 1;
+}
+

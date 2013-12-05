@@ -30,6 +30,7 @@
 #include <MMSystem.h>
 #include <ShlObj.h>
 #include <string>
+#include <stdlib.h>
 
 extern DWORD g_appStartupTime;
 
@@ -115,4 +116,22 @@ CefString ClientApp::AppGetDocumentsDirectory()
     replace(appUserDocuments.begin(), appUserDocuments.end(), '\\', '/');
 
     return CefString(appUserDocuments);
+}
+
+CefString ClientApp::AppGetInstalledDirectory() 
+{
+	wchar_t szBuff[_MAX_PATH];
+    GetModuleFileName(NULL, szBuff, _MAX_PATH);
+	
+	wchar_t drive[_MAX_DRIVE+1];
+	wchar_t dir[_MAX_DIR+1];
+
+	_wsplitpath( szBuff, drive, dir, NULL, NULL );
+
+	std::wstring appInstalledDrive = drive;
+	std::wstring appInstalledDir = dir;
+
+	appInstalledDrive += appInstalledDir;
+
+    return CefString(appInstalledDrive);
 }
