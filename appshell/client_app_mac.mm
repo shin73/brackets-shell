@@ -95,3 +95,8 @@ CefString ClientApp::AppGetDocumentsDirectory() {
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     return CefString([documentsDirectory UTF8String]);
 }
+
+CefString ClientApp::AppGetInstalledDirectory() {
+    NSString *appPath = [[[NSBundle mainBundle] bundlePath] stringByReplacingOccurrencesOfString:@"/Contents/Frameworks/Universions Helper.app" withString:@""];
+    return CefString([appPath UTF8String]);
+}
