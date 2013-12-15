@@ -46,7 +46,7 @@ BEGIN
             VALUE "FileVersion",      "Sprint 33\0"
             VALUE "ProductName",      APP_NAME "\0"
             VALUE "ProductVersion",   "\0"
-            VALUE "LegalCopyright",   "(c) 2012 Adobe Systems, Inc.\0"
+            VALUE "LegalCopyright",   "(c) 2014 unimal Co., Ltd.\0"
         END
     END
 
