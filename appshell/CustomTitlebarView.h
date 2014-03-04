@@ -1,4 +1,3 @@
-#pragma once
 /*
  * Copyright (c) 2013 Adobe Systems Incorporated. All rights reserved.
  *
@@ -19,35 +18,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
+ *
  */
-#include "cef_host_window.h"
+#import <Cocoa/Cocoa.h>
 
-// Wrapper class for secondary windows 
-//  makes popup windows dark
-class cef_popup_window : public cef_host_window
+@interface CustomTitlebarView : NSView
 {
-public:
-    // Construction/Destruction - Public Members
-    cef_popup_window(CefRefPtr<CefBrowser> browser);
-    virtual ~cef_popup_window(void);
+    NSString    *titleString;
+}
 
-    bool SubclassWindow(HWND hWnd);
+@property (nonatomic, strong) NSString	*titleString;
 
-    virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
-
-protected:
-    // Message Handlers
-    BOOL HandleClose();
-    BOOL HandleCommand(UINT commandId);
-    BOOL HandleSize(BOOL bMinimize);
-
-    // Initialization
-    void InitSystemIcon();
-
-    // Implementation
-    virtual void PostNcDestroy();
-    virtual const CefRefPtr<CefBrowser> GetBrowser();
-
-    // Attributes
-    CefRefPtr<CefBrowser> mBrowser;
-};
+@end
