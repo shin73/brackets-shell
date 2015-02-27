@@ -973,8 +973,8 @@ int32 AddMenu(CefRefPtr<CefBrowser> browser, ExtensionString itemTitle, Extensio
         relativeId = "window";
     }
     
-    NSInteger positionIdx = -1;
-    int32 errCode = getNewMenuPosition(browser, nil, position, relativeId, positionIdx);
+    int32 positionIdx = -1;
+    int32 errCode = ::getNewMenuPosition(browser, nil, position, relativeId, positionIdx);
 
     // Another position hack. If position is "first" we will change positionIdx to 1
     // since we can't allow user to put anything before the Mac OS default application menu.
@@ -1013,12 +1013,29 @@ NSUInteger processKeyString(ExtensionString& key)
         appshell_extensions::fixupKey(key, "Opt-", "")) {
         mask |= NSAlternateKeyMask;
     }
-    //replace special keys with ones expected by keyEquivalent
-    const ExtensionString del = (ExtensionString() += NSDeleteCharacter);
-    const ExtensionString backspace = (ExtensionString() += NSBackspaceCharacter);
-    const ExtensionString tab = (ExtensionString() += NSTabCharacter);
-    const ExtensionString enter = (ExtensionString() += NSEnterCharacter);
+
+    unichar pageUpChar   = NSPageUpFunctionKey;
+    unichar pageDownChar = NSPageDownFunctionKey;
+    unichar homeChar     = NSHomeFunctionKey;
+    unichar endChar      = NSEndFunctionKey;
+    unichar insertChar   = NSHelpFunctionKey;
     
+    //replace special keys with ones expected by keyEquivalent
+    const ExtensionString pageUp    = (ExtensionString() += [[NSString stringWithCharacters: &pageUpChar length: 1] UTF8String]);
+    const ExtensionString pageDown  = (ExtensionString() += [[NSString stringWithCharacters: &pageDownChar length: 1] UTF8String]);
+    const ExtensionString home      = (ExtensionString() += [[NSString stringWithCharacters: &homeChar length: 1] UTF8String]);
+    const ExtensionString end       = (ExtensionString() += [[NSString stringWithCharacters: &endChar length: 1] UTF8String]);
+    const ExtensionString ins       = (ExtensionString() += [[NSString stringWithCharacters: &insertChar length: 1] UTF8String]);
+    const ExtensionString del       = (ExtensionString() += NSDeleteCharacter);
+    const ExtensionString backspace = (ExtensionString() += NSBackspaceCharacter);
+    const ExtensionString tab       = (ExtensionString() += NSTabCharacter);
+    const ExtensionString enter     = (ExtensionString() += NSEnterCharacter);
+    
+    appshell_extensions::fixupKey(key, "PageUp", pageUp);
+    appshell_extensions::fixupKey(key, "PageDown", pageDown);
+    appshell_extensions::fixupKey(key, "Home", home);
+    appshell_extensions::fixupKey(key, "End", end);
+    appshell_extensions::fixupKey(key, "Insert", ins);
     appshell_extensions::fixupKey(key, "Delete", del);
     appshell_extensions::fixupKey(key, "Backspace", backspace);
     appshell_extensions::fixupKey(key, "Space", " ");
@@ -1101,8 +1118,8 @@ int32 AddMenuItem(CefRefPtr<CefBrowser> browser, ExtensionString parentCommand, 
                 }
                 NativeMenuModel::getInstance(getMenuParent(browser)).setOsItem(tag, (void*)newItem);
                 
-                NSInteger positionIdx = -1;
-                int32 errCode = getNewMenuPosition(browser, subMenu, position, relativeId, positionIdx);
+                int32 positionIdx = -1;
+                int32 errCode = ::getNewMenuPosition(browser, subMenu, position, relativeId, positionIdx);
                 if (positionIdx > -1) {
                     [subMenu insertItem:newItem atIndex:positionIdx];
                 } else {

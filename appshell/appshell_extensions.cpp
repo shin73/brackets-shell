@@ -358,12 +358,14 @@ public:
             }
         } else if (message_name == "ShowDeveloperTools") {
             // Parameters - none
-            
-            // The CEF-hosted dev tools do not work. Open in a separate browser window instead.
-            // handler->ShowDevTools(browser);
-            
-            ExtensionString url(browser->GetHost()->GetDevToolsURL(true));
-            OpenLiveBrowser(url, false);
+            CefWindowInfo wi;
+            CefBrowserSettings settings;
+
+#if defined(OS_WIN)
+            wi.SetAsPopup(NULL, "DevTools");
+#endif
+            browser->GetHost()->ShowDevTools(wi, browser->GetHost()->GetClient(), settings, CefPoint());
+
         } else if (message_name == "GetNodeState") {
             // Parameters:
             //  0: int32 - callback id
@@ -736,7 +738,35 @@ public:
 
         }
 
-        else {
+        else if (message_name == "GetZoomLevel") {
+            // Parameters:
+            //  0: int32 - callback id
+            double zoomLevel = browser->GetHost()->GetZoomLevel();
+
+            responseArgs->SetDouble(2, zoomLevel);
+        } else if (message_name == "SetZoomLevel") {
+            // Parameters:
+            //  0: int32 - callback id
+            //  1: int32 - zoom level
+
+            if (argList->GetSize() != 2 ||
+                !(argList->GetType(1) == VTYPE_INT || argList->GetType(1) == VTYPE_DOUBLE)) {
+                error = ERR_INVALID_PARAMS;
+            }
+
+            if (error == NO_ERROR) {
+                // cast to double
+                double zoomLevel = 1;
+                
+                if (argList->GetType(1) == VTYPE_DOUBLE) {
+                    zoomLevel = argList->GetDouble(1);
+                } else {
+                    zoomLevel = argList->GetInt(1);
+                }
+
+                browser->GetHost()->SetZoomLevel(zoomLevel);
+            }
+        } else {
             fprintf(stderr, "Native function not implemented yet: %s\n", message_name.c_str());
             return false;
         }

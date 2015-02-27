@@ -21,6 +21,10 @@
  */
 #include "cef_window.h"
 
+//DEFINES
+//HiDPI The default logical DPI when scaling is applied in windows. see. https://msdn.microsoft.com/en-us/library/ms701681(v=vs.85).aspx
+#define DEFAULT_WINDOWS_DPI 96  
+
 // Externals
 extern HINSTANCE hInst;   
 
@@ -35,11 +39,11 @@ struct HookData {
     }
     void Reset()
     {
-        mOldHook = NULL;
+        mhHook = NULL;
         mWindow = NULL;        
     }
 
-    HHOOK       mOldHook;
+    HHOOK       mhHook;
     cef_window* mWindow;
 } gHookData;
 
@@ -61,11 +65,11 @@ cef_window::~cef_window(void)
 static LRESULT CALLBACK _HookProc(int code, WPARAM wParam, LPARAM lParam)
 {
     if (code != HCBT_CREATEWND)
-        return CallNextHookEx(gHookData.mOldHook, code, wParam, lParam);
+        return CallNextHookEx(gHookData.mhHook, code, wParam, lParam);
     
     LPCREATESTRUCT lpcs = ((LPCBT_CREATEWND)lParam)->lpcs;
 
-    HHOOK nextHook = gHookData.mOldHook;
+    HHOOK nextHook = gHookData.mhHook;
 
     if (lpcs->lpCreateParams && lpcs->lpCreateParams == (LPVOID)gHookData.mWindow) 
     {
@@ -74,7 +78,8 @@ static LRESULT CALLBACK _HookProc(int code, WPARAM wParam, LPARAM lParam)
         // Rest the hook data here since we've already hooked this window
         //  this allows for other windows to be created in the WM_CREATE handlers
         //  of subclassed windows
-        gHookData.Reset();
+        gHookData.mWindow = 0;
+
     }
 
     return CallNextHookEx(nextHook, code, wParam, lParam);
@@ -84,17 +89,19 @@ static LRESULT CALLBACK _HookProc(int code, WPARAM wParam, LPARAM lParam)
 static void _HookWindowCreate(cef_window* window)
 {
     // can only hook one creation at a time
-    if (gHookData.mOldHook || gHookData.mWindow) 
+    if (gHookData.mhHook || gHookData.mWindow) 
         return;
 
-    gHookData.mOldHook = ::SetWindowsHookEx(WH_CBT, _HookProc, NULL, ::GetCurrentThreadId());
+    gHookData.mhHook = ::SetWindowsHookEx(WH_CBT, _HookProc, NULL, ::GetCurrentThreadId());
     gHookData.mWindow = window;
 }
 
 // Disabled Hooking
 static void _UnHookWindowCreate()
 {
+   ::UnhookWindowsHookEx(gHookData.mhHook);
     gHookData.Reset();
+    
 }
 
 // Window Proc which receives messages from subclassed windows
@@ -343,4 +350,14 @@ BOOL cef_window::TrackNonClientMouseEvents(bool track/*=true*/)
     tme.cbSize = sizeof (tme) ;
 
     return ::TrackMouseEvent (&tme);
+}
+
+//Get the Horizontal DPI scaling factor. 
+UINT cef_window::GetDPIScalingX() const
+{
+    HDC dc = GetDC();
+    float lpx = dc ? GetDeviceCaps(dc,LOGPIXELSX):DEFAULT_WINDOWS_DPI ;
+    //scale factor as it would look in a default(96dpi) screen. the default will be always 96 logical DPI when scaling is applied in windows.
+    //see. https://msdn.microsoft.com/en-us/library/ms701681(v=vs.85).aspx 
+    return (lpx/DEFAULT_WINDOWS_DPI)*100; 
 }
