@@ -35,7 +35,7 @@ maxerr: 50, node: true */
     var PING_DELAY = 1000; // send ping to parent process every 1 second
     
     var fs                = require("fs"),
-        http              = require("http"),
+        http              = require("https"),
         WebSocket         = require("./thirdparty/ws"),
         EventEmitter      = require("events").EventEmitter,
         Logger            = require("./Logger"),
@@ -179,8 +179,16 @@ maxerr: 50, node: true */
                     callback("ERR_TIMEOUT", null);
                 }, timeout);
             }
+
+            var processPath = process.argv[1];
         
-            httpServer = http.createServer(httpRequestHandler);
+            httpServer = http.createServer({
+
+                // providing server with  SSL key/cert
+                key: fs.readFileSync( processPath + '/cert/server.key' ),
+                cert: fs.readFileSync( processPath + '/cert/server.crt' )
+
+            }, httpRequestHandler);
             
             httpServer.on("error", function () {
                 if (callback) {

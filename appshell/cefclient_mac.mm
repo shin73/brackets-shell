@@ -824,6 +824,7 @@ int main(int argc, char* argv[]) {
   AppGetSettings(settings, app);
 
   settings.no_sandbox = YES;
+  settings.ignore_certificate_errors = YES;
     
   // Check command
   if (CefString(&settings.cache_path).length() == 0) {
